@@ -1,6 +1,6 @@
 # 🏆 Portal de Prêmios e Recompensas (Estudo & Arquitetura Limpa)
 
-Projeto prático para fins acadêmicos e estudo arquitetural, combinando **ASP.NET Core Web API (.NET 8/10)**, **React com TypeScript (Vite)** com interface moderna em **Design Dark Glassmorphism**, persistência orientada a arquivos JSON, suíte rigorosa de **TDD (Test-Driven Development)**, testes ponta a ponta (**Cypress E2E**) e estrutura extensível para Controle de Acesso Baseado em Nível (**RBAC**).
+Projeto prático para fins acadêmicos e estudo arquitetural, combinando **ASP.NET Core Web API (.NET 10)** e **React com TypeScript (Vite)** com interface moderna em **Design Dark Glassmorphism**, persistência orientada a arquivos JSON, suíte rigorosa de **TDD (Test-Driven Development)**, testes ponta a ponta (**Cypress E2E**) e estrutura extensível para Controle de Acesso Baseado em Nível (**RBAC**).
 
 ---
 
@@ -33,7 +33,7 @@ PortalEstudo/
 ├── README.md                           # Documentação completa
 ├── src/
 │   ├── backend/
-│   │   └── PortalPremios.Api/          # ASP.NET Core Web API
+│   │   └── PortalPremios.Api/          # ASP.NET Core Web API (.NET 10 + SpaProxy)
 │   │       ├── Contracts/              # DTOs e Records (RedeemProductRequest, etc.)
 │   │       ├── Controllers/            # Auth, Users, Products (com /redeem), Points, SocialFeed
 │   │       ├── Data/                   # DataSeeder e Storage JSON
@@ -96,8 +96,18 @@ Localizados em `src/frontend/cypress/e2e/portal.cy.ts`:
 ## 🚀 Como Executar o Projeto
 
 ### Pré-requisitos
-- [.NET SDK 8.0+](https://dotnet.microsoft.com/)
+- [.NET SDK 10+](https://dotnet.microsoft.com/)
 - [Node.js 18+](https://nodejs.org/)
+
+---
+
+### Execução no Visual Studio (1 Clique no Iniciar)
+1. Abra a solução **`PortalPremios.sln`** no Visual Studio.
+2. Certifique-se de que o projeto de inicialização está como **`PortalPremios.Api`**.
+3. Clique no botão **Iniciar / Run (F5)** na barra superior:
+   - A API backend (.NET) inicializará na porta `5000`.
+   - O frontend Vite (`npm run dev`) será disparado automaticamente via `SpaProxy` na porta `3000`.
+   - O navegador abrirá diretamente pronto para uso.
 
 ---
 
@@ -143,7 +153,7 @@ npm run test
 
 ### Testes Unitários do Backend (xUnit):
 ```bash
-dotnet test tests/backend/PortalPremios.Tests/PortalPremios.Tests.csproj --no-build
+dotnet test PortalPremios.sln
 ```
 
 ---
@@ -156,5 +166,3 @@ O sistema inicializa automaticamente os arquivos JSON com dados de teste para es
 - **Perfil:** `Admin` (preparado com Enum `UserRole: User = 1, Manager = 2, Admin = 3`)
 - **Saldo Inicial do Admin:** `1.500 pts`
 - **Campanha Padrão:** `Reconhecimento & Inovação 2026` com fundo de pontos inicial disponível.
-#   P o r t a l - d e - p r e m i o s  
- 
