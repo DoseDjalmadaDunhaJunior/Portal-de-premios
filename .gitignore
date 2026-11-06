@@ -1,0 +1,40 @@
+## Ignore Visual Studio, .NET & C#
+bin/
+obj/
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+_ReSharper*/
+*.suo
+*.userprefs
+TestResults/
+
+## Ignore Node & Frontend
+node_modules/
+dist/
+dist-ssr/
+*.local
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+## Database & Local Data Storage
+src/backend/PortalPremios.Api/Data/Storage/*.json
+!src/backend/PortalPremios.Api/Data/Storage/seed_*.json
+
+## Logs and Temp files
+logs/
+*.log
+.DS_Store
+Thumbs.db
+
+## IDEs & Editors
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
