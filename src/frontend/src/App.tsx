@@ -8,6 +8,7 @@ import { UserModal } from './components/UserModal';
 import { ProductModal } from './components/ProductModal';
 import { ManagePointsModal } from './components/ManagePointsModal';
 import { StatementView } from './components/StatementView';
+import { useTheme } from './contexts/ThemeContext';
 import {
   Trophy,
   Gift,
@@ -20,10 +21,13 @@ import {
   Send,
   Image as ImageIcon,
   CheckCircle,
-  Plus
+  Plus,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 export function App() {
+  const { theme, toggleTheme } = useTheme();
   const [currentUser, setCurrentUser] = useState<LoginResponse | null>(null);
   const [activeTab, setActiveTab] = useState<'feed' | 'catalog' | 'statement'>('feed');
 
@@ -138,7 +142,7 @@ export function App() {
       : 'Colaborador';
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0b0f19', color: '#f1f5f9' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-page)', color: 'var(--color-text)' }}>
       {/* Toast Notification */}
       {toastMessage && (
         <div style={{
@@ -213,6 +217,24 @@ export function App() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button
+              onClick={toggleTheme}
+              data-cy="theme-toggle"
+              title={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+              style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid var(--border-subtle)',
+                padding: '8px',
+                borderRadius: '10px',
+                color: 'var(--color-text-muted)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                transition: 'all 0.2s',
+              }}
+            >
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>{currentUser.fullName}</div>
               <div style={{ fontSize: '11px', color: '#94a3b8' }}>{roleName} ({currentUser.username})</div>
@@ -255,7 +277,7 @@ export function App() {
           <div style={{
             display: 'flex',
             gap: '6px',
-            background: 'rgba(15, 23, 42, 0.8)',
+            background: 'var(--bg-tab)',
             padding: '5px',
             borderRadius: '14px',
             border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -408,8 +430,8 @@ export function App() {
                       padding: '14px',
                       borderRadius: '12px',
                       border: '1px solid rgba(255, 255, 255, 0.12)',
-                      background: 'rgba(15, 23, 42, 0.6)',
-                      color: '#ffffff',
+                      background: 'var(--bg-feed-box)',
+                      color: 'var(--color-text)',
                       fontSize: '14px',
                       boxSizing: 'border-box',
                       resize: 'none',
@@ -484,9 +506,9 @@ export function App() {
                 {campaigns.map((camp) => (
                   <div key={camp.id} style={{
                     padding: '14px',
-                    background: 'rgba(15, 23, 42, 0.6)',
+                    background: 'var(--campaign-bg)',
                     borderRadius: '12px',
-                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                    border: '1px solid var(--campaign-border)',
                   }}>
                     <div style={{ fontWeight: 700, fontSize: '14px', color: '#ffffff' }}>{camp.name}</div>
                     <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px', lineHeight: '1.4' }}>

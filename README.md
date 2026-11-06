@@ -1,6 +1,6 @@
 # 🏆 Portal de Prêmios e Recompensas (Estudo & Arquitetura Limpa)
 
-Projeto prático para fins acadêmicos e estudo arquitetural, combinando **ASP.NET Core Web API (.NET 10)** e **React com TypeScript (Vite)** com interface moderna em **Design Dark Glassmorphism**, persistência orientada a arquivos JSON, suíte rigorosa de **TDD (Test-Driven Development)**, testes ponta a ponta (**Cypress E2E**) e estrutura extensível para Controle de Acesso Baseado em Nível (**RBAC**).
+Projeto prático para fins acadêmicos e estudo arquitetural, combinando **ASP.NET Core Web API (.NET 10)** e **React com TypeScript (Vite)** com interface moderna em **Design Dark Glassmorphism**, suporte a **tema claro/escuro**, persistência orientada a arquivos JSON, suíte rigorosa de **TDD (Test-Driven Development)**, testes ponta a ponta (**Cypress E2E**) e estrutura extensível para Controle de Acesso Baseado em Nível (**RBAC**).
 
 ---
 
@@ -10,7 +10,7 @@ Projeto prático para fins acadêmicos e estudo arquitetural, combinando **ASP.N
   - Conduziu o fluxo estrito de TDD (Red-Green-Refactor).
   - Implementou e validou a suíte de testes unitários do backend com `xUnit`, `Moq` e `FluentAssertions` (**17 testes aprovados**, incluindo regras de negócio para resgate de prêmios, estoque e saldo).
   - Implementou e validou a suíte de testes unitários de componentes do frontend com `Vitest` e `@testing-library/react` (**8 testes aprovados**, incluindo botão de resgate e esgotamento de estoque).
-  - Implementou a suíte de testes ponta a ponta (E2E) com **Cypress** (**5 cenários completos aprovados**, incluindo o fluxo real de resgate e atualização de saldo).
+  - Implementou a suíte de testes ponta a ponta (E2E) com **Cypress** (**6 cenários completos aprovados**, incluindo validação de valores exatos e toggle de tema).
 - **Agente B (Tech Writer / Doc):**
   - Elaborou o guia de arquitetura, documentação dos testes executados e este `README.md`.
 - **Agente C (Backend Dev):**
@@ -19,8 +19,51 @@ Projeto prático para fins acadêmicos e estudo arquitetural, combinando **ASP.N
   - Implementou a persistência leve via repositórios genéricos assíncronos e thread-safe com arquivos JSON (`IJsonRepository<T>`).
   - Implementou o *Seeding* automático inicial com produtos, campanhas, postagens e credenciais padrão (`admin`/`admin`).
 - **Agente D (Frontend Dev):**
-  - Implementou a funcionalidade interativa de **Resgate de Prêmios** diretamente nos cards do catálogo, com botão dinâmico para itens acessíveis, tratamento de itens esgotados, débito em tempo real no saldo do usuário e geração de extrato.
-  - Aplicou padrão visual contemporâneo (Dark Glassmorphism, efeitos de profundidade, glow gradients, feedback visual via toasts e modais com validações e sincronização reativa).
+  - Implementou a funcionalidade interativa de **Resgate de Prêmios** diretamente nos cards do catálogo.
+  - Implementou o **sistema de tema claro/escuro** via `ThemeContext`, variáveis CSS e persistência em `localStorage`.
+  - Aplicou padrão visual contemporâneo (Dark Glassmorphism, efeitos de profundidade, glow gradients, feedback visual via toasts e modais).
+
+---
+
+## 🎨 Sistema de Tema Claro / Escuro
+
+O portal suporta alternância entre **tema escuro** (padrão — Dark Glassmorphism) e **tema claro** (Light), com as seguintes características:
+
+### Como usar
+- Clique no botão **☀️ / 🌙** localizado na barra de navegação superior (à direita do saldo de pontos).
+- O tema é **persistido automaticamente** em `localStorage` e restaurado na próxima visita.
+
+### Arquitetura da solução
+| Arquivo | Responsabilidade |
+|---|---|
+| `src/contexts/ThemeContext.tsx` | Context API: `ThemeProvider` + hook `useTheme()` |
+| `src/index.css` | Variáveis CSS em `[data-theme="dark"]` e `[data-theme="light"]` |
+| `src/main.tsx` | Envolve `<App>` com `<ThemeProvider>` |
+| `src/App.tsx` | Lê `theme` / `toggleTheme` via hook; renderiza botão Sun/Moon |
+| `src/components/LoginForm.tsx` | Usa variável `var(--login-bg)` para o gradiente de fundo |
+
+### Variáveis CSS principais
+```css
+/* Escuro */
+[data-theme="dark"] {
+  --bg-page:          #0b0f19;
+  --bg-panel:         rgba(15, 23, 42, 0.75);
+  --bg-card:          rgba(30, 41, 59, 0.6);
+  --color-text:       #f1f5f9;
+  --color-heading:    #ffffff;
+  /* ... */
+}
+
+/* Claro */
+[data-theme="light"] {
+  --bg-page:          #f0f4f8;
+  --bg-panel:         rgba(255, 255, 255, 0.85);
+  --bg-card:          rgba(255, 255, 255, 0.75);
+  --color-text:       #1e293b;
+  --color-heading:    #0f172a;
+  /* ... */
+}
+```
 
 ---
 
@@ -28,68 +71,69 @@ Projeto prático para fins acadêmicos e estudo arquitetural, combinando **ASP.N
 
 ```text
 PortalEstudo/
-├── .gitignore                          # Configurado para .NET, Node, Vite, JSONs locais e IDEs
-├── PortalPremios.sln                   # Arquivo de solução Visual Studio
-├── README.md                           # Documentação completa
+├── .gitignore
+├── .gitattributes
+├── PortalPremios.sln                   # Solução Visual Studio (.NET)
+├── README.md
 ├── src/
 │   ├── backend/
 │   │   └── PortalPremios.Api/          # ASP.NET Core Web API (.NET 10 + SpaProxy)
-│   │       ├── Contracts/              # DTOs e Records (RedeemProductRequest, etc.)
-│   │       ├── Controllers/            # Auth, Users, Products (com /redeem), Points, SocialFeed
-│   │       ├── Data/                   # DataSeeder e Storage JSON
-│   │       │   └── Storage/            # users.json, products.json, campaigns.json, etc.
-│   │       ├── Domain/                 # Entidades de Domínio e Enums (TransactionType.Redemption)
-│   │       ├── Repositories/           # IJsonRepository<T> e implementação JsonRepository<T>
-│   │       ├── Services/               # UserService, ProductService (com resgate), PointsService
-│   │       └── Program.cs              # Injeção de dependências, CORS e Inicialização
-│   └── frontend/                       # React 19 com TypeScript & Vite (Dark Glassmorphism)
+│   │       ├── Contracts/
+│   │       ├── Controllers/
+│   │       ├── Data/
+│   │       │   └── Storage/            # users.json, products.json, etc.
+│   │       ├── Domain/
+│   │       ├── Repositories/
+│   │       ├── Services/
+│   │       └── Program.cs
+│   └── frontend/                       # React 19 + TypeScript + Vite
 │       ├── cypress/
-│       │   └── e2e/                    # Testes E2E com Cypress (portal.cy.ts)
+│       │   └── e2e/
+│       │       └── portal.cy.ts        # 6 testes E2E (com validação de valores)
 │       ├── src/
-│       │   ├── components/             # LoginForm, ProductCard (com resgate), PostCard, StatementView, Modais
-│       │   ├── services/               # api.ts (comunicação REST com redeemProduct)
-│       │   ├── test/                   # Testes unitários com Vitest e React Testing Library
-│       │   ├── types/                  # Contratos e tipos TypeScript (User, Product, Campaign...)
-│       │   ├── App.tsx                 # Dashboard principal moderno
+│       │   ├── components/
+│       │   ├── contexts/
+│       │   │   └── ThemeContext.tsx     # 🎨 Contexto de Tema Claro/Escuro
+│       │   ├── services/
+│       │   ├── test/
+│       │   ├── types/
+│       │   ├── App.tsx
+│       │   ├── index.css               # Variáveis CSS de tema
 │       │   └── main.tsx
-│       ├── cypress.config.ts           # Configuração do Cypress E2E
 │       ├── package.json
 │       ├── vite.config.ts
 │       └── tsconfig.json
 └── tests/
     └── backend/
-        └── PortalPremios.Tests/        # Projeto xUnit com FluentAssertions e Moq
-            ├── Services/               # ProductServiceTests (com testes de resgate), UserServiceTests, etc.
-            └── PortalPremios.Tests.csproj
+        └── PortalPremios.Tests/        # xUnit + FluentAssertions + Moq
 ```
 
 ---
 
 ## 🧪 Resumo dos Testes e Validação (100% Sucesso)
 
-### 🔹 1. Testes Ponta a Ponta com Cypress E2E (5/5 Aprovados)
+### 🔹 1. Testes Ponta a Ponta com Cypress E2E (6/6 Aprovados)
 Localizados em `src/frontend/cypress/e2e/portal.cy.ts`:
-1. **Login & Autenticação:** Acessa com `admin`/`admin` e valida renderização do dashboard, nome do usuário e saldo de pontos.
-2. **Cadastro de Usuário:** Abre modal, cadastra um novo usuário e valida o fechamento e notificação de sucesso.
-3. **Cadastro de Prêmio no Catálogo:** Abre modal de produto, insere detalhes/pontuação e valida a renderização imediata do card no catálogo.
-4. **Gestão & Distribuição de Pontos:** Transfere pontos da campanha para um usuário e valida o registro refletido no Extrato de Pontos com timestamp.
-5. **Resgate de Produto no Catálogo:** Localiza o item, clica em "Resgatar Prêmio", valida o débito de pontos no saldo do usuário e a gravação da transação de resgate no Extrato.
+
+| # | Cenário | Validação de Valor |
+|---|---|---|
+| 1 | **Login & Autenticação** — acessa com `admin`/`admin`, valida nome e saldo | ✅ Saldo inicial = **1.500 pts** |
+| 2 | **Cadastro de Usuário** — abre modal, cadastra e valida notificação | — |
+| 3 | **Cadastro de Prêmio** — cria produto com custo 250 pts | ✅ Card exibe **250 pts** |
+| 4 | **Distribuição de Pontos** — distribui 50 pts ao `admin` | ✅ Extrato exibe **50 pts** na transação |
+| 5 | **Resgate de Produto** — cria item de 10 pts e resgata | ✅ Saldo decrementou **exatamente 10 pts** |
+| 6 | **Toggle de Tema** — alterna entre claro e escuro | ✅ Atributo `data-theme` validado no `<html>` |
 
 ### 🔹 2. Backend (17 Testes Unitários - xUnit / Moq / FluentAssertions)
-1. **ProductServiceTests (6 testes):**
-   - Listagem de produtos.
-   - Criação com dados válidos e rejeição com custo inválido.
-   - Resgate com sucesso (deduz saldo do usuário, diminui estoque do produto e gera `PointTransaction` do tipo `Redemption`).
-   - Bloqueio de resgate se saldo insuficiente.
-   - Bloqueio de resgate se produto esgotado (estoque 0).
-2. **UserServiceTests (4 testes):** Autenticação válida/inválida, criação de usuário e validação de duplicidade.
-3. **PointsServiceTests (5 testes):** Aporte em campanha, distribuição debitando campanha e creditando usuário, rejeição por saldo insuficiente e ordenação decrescente de extratos.
-4. **SocialPostServiceTests (2 testes):** Publicação de posts vinculada ao autor e ação de curtidas.
+1. **ProductServiceTests (6 testes):** Listagem, criação, resgate com sucesso, bloqueio por saldo insuficiente, bloqueio por estoque esgotado.
+2. **UserServiceTests (4 testes):** Autenticação válida/inválida, criação e duplicidade.
+3. **PointsServiceTests (5 testes):** Aporte, distribuição, rejeição e ordenação.
+4. **SocialPostServiceTests (2 testes):** Publicação e curtidas.
 
 ### 🔹 3. Frontend (8 Testes Unitários - Vitest / RTL)
-1. **LoginForm.test.tsx:** Renderização de formulário e autenticação.
-2. **ProductCard.test.tsx:** Renderização de prêmio, validação do botão de resgate com callback, indicação de pontos faltantes e mensagem de esgotado.
-3. **PostCard.test.tsx:** Renderização de postagem, anexos e curtidas.
+1. **LoginForm.test.tsx:** Renderização e autenticação.
+2. **ProductCard.test.tsx:** Resgate, pontos faltantes, esgotado.
+3. **PostCard.test.tsx:** Renderização, anexos e curtidas.
 
 ---
 
@@ -104,44 +148,42 @@ Localizados em `src/frontend/cypress/e2e/portal.cy.ts`:
 ### Execução no Visual Studio (1 Clique no Iniciar)
 1. Abra a solução **`PortalPremios.sln`** no Visual Studio.
 2. Certifique-se de que o projeto de inicialização está como **`PortalPremios.Api`**.
-3. Clique no botão **Iniciar / Run (F5)** na barra superior:
+3. Clique no botão **Iniciar / Run (F5)**:
    - A API backend (.NET) inicializará na porta `5000`.
    - O frontend Vite (`npm run dev`) será disparado automaticamente via `SpaProxy` na porta `3000`.
    - O navegador abrirá diretamente pronto para uso.
 
 ---
 
-### Execução via Linha de Comando (CLI / VS Code)
+### Execução via Linha de Comando (CLI)
 
 #### 1. Iniciar o Backend:
 ```bash
-# Na raiz do projeto
 cd src/backend/PortalPremios.Api
 dotnet run
 ```
-> O backend estará acessível em: `http://localhost:5000`
+> Backend em: `http://localhost:5000`
 
 #### 2. Iniciar o Frontend:
 ```bash
-# Em outro terminal, na raiz do projeto
 cd src/frontend
 npm install
 npm run dev
 ```
-> O frontend estará acessível em: `http://localhost:3000`
+> Frontend em: `http://localhost:3000`
 
 ---
 
 ## ⚙️ Como Rodar os Testes
 
-### Testes End-to-End (Cypress):
-Com o backend e frontend rodando:
+### Testes End-to-End (Cypress) — com backend e frontend rodando:
 ```bash
 cd src/frontend
+
 # Modo headless (terminal):
 npm run cypress:run
 
-# Modo interativo (interface gráfica do Cypress):
+# Modo interativo (interface gráfica):
 npm run cypress:open
 ```
 
@@ -160,9 +202,8 @@ dotnet test PortalPremios.sln
 
 ## 🔑 Credenciais Padrão & Seeding Inicial
 
-O sistema inicializa automaticamente os arquivos JSON com dados de teste para estudo:
-- **Usuário Padrão:** `admin`
-- **Senha Padrão:** `admin`
-- **Perfil:** `Admin` (preparado com Enum `UserRole: User = 1, Manager = 2, Admin = 3`)
-- **Saldo Inicial do Admin:** `1.500 pts`
+O sistema inicializa automaticamente com dados de estudo:
+- **Usuário:** `admin` / **Senha:** `admin`
+- **Perfil:** `Admin` (Enum `UserRole: User = 1, Manager = 2, Admin = 3`)
+- **Saldo Inicial:** `1.500 pts`
 - **Campanha Padrão:** `Reconhecimento & Inovação 2026` com fundo de pontos inicial disponível.

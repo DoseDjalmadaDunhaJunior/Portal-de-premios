@@ -35,7 +35,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       alignItems: 'center',
       justifyContent: 'center',
       padding: '20px',
-      background: 'radial-gradient(ellipse at top, #1e1b4b 0%, #0b0f19 70%)',
+      background: 'var(--login-bg)',
     }}>
       <div className="glass-modal animate-fade-in" style={{
         maxWidth: '440px',
